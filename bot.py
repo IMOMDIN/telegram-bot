@@ -5,11 +5,21 @@ import time
 TOKEN = os.getenv("TOKEN")
 bot = telebot.TeleBot(TOKEN)
 
+users = set()
+
 @bot.message_handler(commands=['start'])
 def start(msg):
-    bot.send_message(msg.chat.id, "Бот работает стабильно и бесплатно.")
+    users.add(msg.chat.id)
+    bot.send_message(msg.chat.id, "Привет. Я рабочий Telegram-бот.")
 
-# Работаем ограниченное время, чтобы GitHub Actions не зависал
+@bot.message_handler(commands=['stats'])
+def stats(msg):
+    bot.send_message(msg.chat.id, f"Пользователей: {len(users)}")
+
+@bot.message_handler(func=lambda m: True)
+def echo(msg):
+    bot.send_message(msg.chat.id, f"Ты написал: {msg.text}")
+
 start_time = time.time()
 while time.time() - start_time < 55:
     try:
